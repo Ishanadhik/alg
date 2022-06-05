@@ -12,39 +12,44 @@ if(!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !==true)
 require_once "algconfig.php";
 
 $email=$_SESSION["email"];
-$temail = $mail ="";
+$temail = $model= "";
 
 //database bata teacher ko name ani reason ko corresponding data haru taneko  
-if(isset($_POST['submit'])){
-    if(!empty($tname) && !empty($reason)){
-        echo "please select";
-    }else{
+
             if(isset($_POST['tname']) && isset($_POST['reason']) ){
-               $tname = $_POST['tname'];
+                $tname = $_POST['tname'];
                 $reason = $_POST['reason'];
+                if(isset($_POST['submit'])){
+                    if(empty($tname) && empty($reason)){
+                        echo "please select";
+                    }else{
+                        
+                               
+                            $sql1 = "SELECT temail FROM teacher_detail WHERE tname = $tname";
+                            $temail = mysqli_query($conn, $sql1);
 
-                $sql1 = "SELECT temail FROM teacher_detail WHERE tname =$tname";
-                $temail = mysqli_query($conn, $sql1);
+                            $sql2 = "SELECT mail FROM reason WHERE reason = $reason";
+                            $model = mysqli_query($conn, $sql2);
 
-                $sql2 = "SELECT mail FROM reason WHERE reason=$reason";
-                $model = mysqli_query($conn,$sql2);
+                            //taneko data bata mail haneko 
+
+                            $to_email = $temail;
+                            $subject = "Application for leave";
+                            $body = $model . "ishan" . "adhikari";
+                            $from = $email;
+                            ini_set("sendmail_from",$email);
+
+                            if(mail($to_email, $subject,$body,)){
+                                echo "MAIL sent SUCCESSFULLY";
+                            }else{
+                                echo"MAIL was not sent";
+                            }
             }
         }
 }
 
-//taneko data bata mail haneko 
 
-$to_email = $temail;
-$subject = "Application for leave";
-$body = $mail . "ishan" . "adhikari";
-$from = $email;
-ini_set("sendmail_from",$email);
 
-if(mail($to_email, $subject,$body,)){
-    echo "MAIL sent SUCCESSFULLY";
-}else{
-    echo"MAIL was not sent";
-}
 
 
 
@@ -71,13 +76,14 @@ if(mail($to_email, $subject,$body,)){
     </nav>
 
     <div class="container mt-4">
-        <h3><?php echo "Welcome ". "ishan" ?> !Now you can send emails to teacher in an instant</h3>
+        <h3><?php echo "Welcome "?> !Now you can send emails to teacher in an instant</h3>
         <hr>
     </div>
 
         <form action="alg.php" method="POST">
             <select name="tname"class="form-select">
                 <option value="">Select teacher</option>
+                <option value="Ishan Adhikari">Ishan Adhhikari</option>
                 <option value="Sagina Maharjan">Sagina Maharjan</option>
                 <option value="Kusal Bista">Kusal Bista</option>
                 <option value="Prayush Shrestha">Prayush Shrestha</option>
